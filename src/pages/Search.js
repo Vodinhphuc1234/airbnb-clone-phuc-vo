@@ -1,10 +1,10 @@
 import axios from "axios";
 import { format } from "date-fns";
-import { tr } from "date-fns/locale";
 import React, { Fragment, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import InfoCard from "../components/home/InfoCard";
 import InforLoading from "../components/Loading/info";
+import CustomeMap from "../components/Map";
 
 export default function Search() {
   const [searchParams] = useSearchParams();
@@ -18,6 +18,7 @@ export default function Search() {
   const noOfGuests = searchParams.get("noOfGuests");
 
   const [searchDatas, setSearchDatas] = useState([]);
+  const [coors, setCoors] = useState([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     const getSearchData = async () => {
@@ -29,6 +30,12 @@ export default function Search() {
       );
 
       setSearchDatas(data.data);
+      const retCoors = data.data.map((item) => ({
+        description: item.description,
+        latitude: item.lat,
+        longitude: item.long,
+      }));
+      setCoors(retCoors);
       setLoading(false);
     };
     getSearchData();
@@ -50,7 +57,7 @@ export default function Search() {
         </div>
       </section>
 
-      <main>
+      <main className="flex">
         <div className="grid xl:grid-cols-2">
           {loading ? (
             <Fragment>
@@ -62,6 +69,9 @@ export default function Search() {
           ) : (
             searchDatas.map((item) => <InfoCard key={item.img} {...item} />)
           )}
+        </div>
+        <div>
+          <CustomeMap coors={coors} />
         </div>
       </main>
     </div>
